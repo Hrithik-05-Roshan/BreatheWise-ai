@@ -14,18 +14,14 @@ import { LOCAL_STORAGE_PROFILE_KEY } from "@/components/onboarding/OnboardingWiz
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Sidebar, DashboardTab } from "@/components/layout/Sidebar";
-import { AQICard } from "@/components/dashboard/AQICard";
-import { PersonalizedExposureCard } from "@/components/dashboard/PersonalizedExposureCard";
-import { HourlyChart } from "@/components/dashboard/HourlyChart";
-import { DailyStatusCard } from "@/components/dashboard/DailyStatusCard";
-import { HouseholdChecklist } from "@/components/dashboard/HouseholdChecklist";
-import { ImpactSummary } from "@/components/dashboard/ImpactSummary";
-import { RecommendationCard } from "@/components/recommendations/RecommendationCard";
+import { OverviewTab } from "@/components/dashboard/OverviewTab";
+import { DailyPlanTab } from "@/components/dashboard/DailyPlanTab";
 import { ChatInterface } from "@/components/assistant/ChatInterface";
 import { CommuteComparison } from "@/components/commute/CommuteComparison";
 import { IndoorAirAudit } from "@/components/indoor-air/IndoorAirAudit";
 import { SustainableActionsList } from "@/components/sustainability/SustainableActionsList";
 import { CommunityHub } from "@/components/community/CommunityHub";
+import { ImpactSummary } from "@/components/dashboard/ImpactSummary";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -216,67 +212,21 @@ function DashboardContent() {
 
           {/* TAB CONTENT: 1. OVERVIEW */}
           {activeTab === "overview" && airQuality && (
-            <div className="space-y-6 animate-fade-in">
-              {/* Row 1: Air Quality Gauge & Personalized Impact */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div className="lg:col-span-7">
-                  <AQICard data={airQuality} />
-                </div>
-                <div className="lg:col-span-5">
-                  <PersonalizedExposureCard profile={profile} airQuality={airQuality} />
-                </div>
-              </div>
-
-              {/* Row 2: Diurnal Action Schedule */}
-              <DailyStatusCard slots={diurnalSlots} />
-
-              {/* Row 3: Hourly Inversion Chart & Checklist */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div className="lg:col-span-7">
-                  <HourlyChart data={airQuality.hourly} />
-                </div>
-                <div className="lg:col-span-5">
-                  <HouseholdChecklist />
-                </div>
-              </div>
-
-              {/* Row 4: Top Prioritized Recommendations Feed */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
-                    Today&apos;s Context-Prioritized Recommendations
-                  </h3>
-                  <Badge variant="outline" className="text-xs">
-                    {recommendations.length} Actionable Items
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {recommendations.slice(0, 4).map((rec) => (
-                    <RecommendationCard key={rec.id} rec={rec} />
-                  ))}
-                </div>
-              </div>
-
-              {/* Row 5: Environmental Impact Summary */}
-              <ImpactSummary data={impactData} />
-            </div>
+            <OverviewTab
+              airQuality={airQuality}
+              profile={profile}
+              diurnalSlots={diurnalSlots}
+              recommendations={recommendations}
+              impactData={impactData}
+            />
           )}
 
           {/* TAB CONTENT: 2. MY DAILY PLAN */}
           {activeTab === "daily-plan" && airQuality && (
-            <div className="space-y-6 animate-fade-in">
-              <DailyStatusCard slots={diurnalSlots} />
-              <div className="space-y-4">
-                <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
-                  Full 24-Hour Personalized Actions
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {recommendations.map((rec) => (
-                    <RecommendationCard key={rec.id} rec={rec} />
-                  ))}
-                </div>
-              </div>
-            </div>
+            <DailyPlanTab
+              diurnalSlots={diurnalSlots}
+              recommendations={recommendations}
+            />
           )}
 
           {/* TAB CONTENT: 3. INDOOR AIR */}

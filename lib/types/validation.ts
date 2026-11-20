@@ -75,3 +75,24 @@ export const CommuteQuerySchema = z.object({
   distanceKm: z.number().min(0.5).max(150),
   currentAqi: z.number().min(0).max(1000),
 });
+
+export const AirQualityQuerySchema = z.object({
+  city: z.string().min(1).max(100).default("Delhi"),
+  lat: z.coerce.number().min(-90).max(90).optional(),
+  lon: z.coerce.number().min(-180).max(180).optional(),
+});
+
+export const RecommendationsRequestSchema = z.object({
+  aqi: z.number().min(0).max(1000),
+  pm25: z.number().min(0).max(2000),
+  pm10: z.number().min(0).max(3000),
+  city: z.string().min(1).max(100),
+  household: z.string(),
+  lifestyle: z.string(),
+  commuteMethod: z.string(),
+  commuteDistanceKm: z.number().min(0).max(200),
+  hasAirPurifier: z.boolean(),
+  windowsOpen: z.boolean(),
+  cookingFuel: z.string(),
+  budgetPreference: z.string(),
+});

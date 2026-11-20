@@ -15,7 +15,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="min-h-screen bg-slate-50/50 font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100 selection:bg-emerald-200 selection:text-emerald-900">
-        {children}
+        {/* WCAG 2.2 AA Bypass Block / Skip to Main Content */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-emerald-800 focus:text-white focus:rounded-lg focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-white text-xs font-semibold"
+        >
+          Skip to main content
+        </a>
+        <div id="main-content">{children}</div>
       </body>
     </html>
   );

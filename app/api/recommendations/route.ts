@@ -1,20 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generatePersonalizedRecommendations, buildDiurnalPlan } from "@/lib/recommendations/engine";
+import { RecommendationsRequestSchema } from "@/lib/types/validation";
 import { RecommendationContext } from "@/lib/types/recommendations";
 
 export async function POST(request: NextRequest) {
   try {
-    const body: RecommendationContext = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON format" }, { status: 400 });
+    }
 
-    if (!body || typeof body.aqi !== "number") {
+    const validation = RecommendationsRequestSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "Missing required environmental parameters (aqi)" },
+        {
+          error: "Invalid recommendation context parameters",
+          details: validation.error.format(),
+        },
         { status: 400 }
       );
     }
 
-    const recommendations = generatePersonalizedRecommendations(body);
-    const diurnalPlan = buildDiurnalPlan(recommendations, body.aqi);
+    const context: RecommendationContext = validation.data;
+    const recommendations = generatePersonalizedRecommendations(context);
+    const diurnalPlan = buildDiurnalPlan(recommendations, context.aqi);
 
     return NextResponse.json({
       success: true,

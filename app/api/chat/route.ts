@@ -36,7 +36,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Body Size & JSON Parsing Check
+    // 2. Payload Size Limit Check
+    const contentLength = request.headers.get("content-length");
+    if (contentLength && parseInt(contentLength, 10) > 25000) {
+      return NextResponse.json(
+        { error: "Payload size too large (exceeds 25KB)" },
+        { status: 413 }
+      );
+    }
+
+    // 3. Body Parsing Check
     let body;
     try {
       body = await request.json();

@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 150 20% 98%;
+    --foreground: 160 25% 10%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 160 25% 10%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 25% 10%;
+    
+    --primary: 158 64% 24%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 154 35% 92%;
+    --secondary-foreground: 158 64% 18%;
+    
+    --muted: 150 15% 94%;
+    --muted-foreground: 160 10% 40%;
+    
+    --accent: 152 45% 88%;
+    --accent-foreground: 158 64% 18%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 150 20% 88%;
+    --input: 150 20% 88%;
+    --ring: 158 64% 24%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 160 30% 6%;
+    --foreground: 150 15% 95%;
+    
+    --card: 160 28% 9%;
+    --card-foreground: 150 15% 95%;
+    
+    --popover: 160 28% 9%;
+    --popover-foreground: 150 15% 95%;
+    
+    --primary: 156 72% 38%;
+    --primary-foreground: 160 30% 6%;
+    
+    --secondary: 160 25% 15%;
+    --secondary-foreground: 150 20% 90%;
+    
+    --muted: 160 20% 16%;
+    --muted-foreground: 150 10% 65%;
+    
+    --accent: 160 25% 18%;
+    --accent-foreground: 150 20% 90%;
+    
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 160 20% 18%;
+    --input: 160 20% 18%;
+    --ring: 156 72% 38%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-emerald-200 selection:text-emerald-900;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.4);
+}

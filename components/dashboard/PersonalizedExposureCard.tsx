@@ -3,6 +3,7 @@
 import React from "react";
 import { UserProfile } from "@/lib/types/profile";
 import { AirQualityData } from "@/lib/types/air-quality";
+import { calculatePersonalizedVulnerability } from "@/lib/air-quality/calculations";
 import { ShieldAlert, UserCheck, AlertCircle, Sparkles, HeartPulse } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -16,32 +17,8 @@ export function PersonalizedExposureCard({
   const isSevere = airQuality.aqi > 300;
   const isPoor = airQuality.aqi > 200;
 
-  // Derive personalized exposure vulnerability profile
-  let vulnerabilityScore = 40; // baseline
-  let factors: string[] = [];
-
-  if (profile.household === "family_children") {
-    vulnerabilityScore += 30;
-    factors.push("Pediatric lung development vulnerability");
-  } else if (profile.household === "household_seniors") {
-    vulnerabilityScore += 30;
-    factors.push("Senior cardiovascular & respiratory sensitivity");
-  }
-
-  if (profile.commuteMethod === "bicycle" || profile.commuteMethod === "walking") {
-    vulnerabilityScore += 25;
-    factors.push(`Active exertion during commute (${profile.commuteDistanceKm} km)`);
-  } else if (profile.commuteMethod === "two_wheeler") {
-    vulnerabilityScore += 20;
-    factors.push("Open roadside tailpipe proximity");
-  }
-
-  if (!profile.indoorEnvironment.hasAirPurifier) {
-    vulnerabilityScore += 15;
-    factors.push("No active indoor HEPA filtration");
-  }
-
-  vulnerabilityScore = Math.min(100, vulnerabilityScore);
+  // Derive personalized exposure vulnerability profile via pure domain calculation
+  const { vulnerabilityScore, factors } = calculatePersonalizedVulnerability(profile);
 
   return (
     <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">

@@ -45,7 +45,7 @@ export function generateDeterministicFallbackResponse(
   const isPoor = ctx.aqi > 200;
   const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-  let situation = `Current air quality in ${ctx.location} is at AQI ${ctx.aqi} (${ctx.category}), driven predominantly by ${ctx.mainPollutant} (${ctx.pm25} µg/m³ PM2.5, which is ${Math.round((ctx.pm25 / 60) * 100)}% of the national safe standard).`;
+  const situation = `Current air quality in ${ctx.location} is at AQI ${ctx.aqi} (${ctx.category}), driven predominantly by ${ctx.mainPollutant} (${ctx.pm25} µg/m³ PM2.5, which is ${Math.round((ctx.pm25 / 60) * 100)}% of the national safe standard).`;
 
   let whatItMeans = `As a ${ctx.lifestyle.replace("_", " ")} with a ${ctx.household.replace("_", " ")} household, `;
   if (isSevere) {

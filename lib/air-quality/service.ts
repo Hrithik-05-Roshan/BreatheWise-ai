@@ -12,7 +12,14 @@ const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 const aqiCache: Map<string, CacheEntry> = new Map();
 
 /**
- * Generate simulated high-fidelity demonstration air quality data for realistic offline resilience
+ * Generates simulated high-fidelity demonstration air quality data for realistic offline resilience,
+ * including 24-hour diurnal trends, pollutant breakdowns, and CPCB category derivations.
+ *
+ * @param city - City name
+ * @param lat - Latitude coordinate
+ * @param lon - Longitude coordinate
+ * @param scenario - Pollution severity scenario ('severe_winter', 'moderate', 'good')
+ * @returns Fully populated AirQualityData structure
  */
 export function generateDemonstrationData(
   city: string,
@@ -87,8 +94,13 @@ export function generateDemonstrationData(
 }
 
 /**
- * Fetch real-world live air quality data from Open-Meteo Air Quality API
- * Fallback to demonstration data on network timeout or API error
+ * Fetches real-world live air quality data from the Open-Meteo Air Quality API with in-memory caching.
+ * Gracefully falls back to high-fidelity demonstration data on network timeout or API error.
+ *
+ * @param city - Target city name
+ * @param latitude - Optional geographic latitude
+ * @param longitude - Optional geographic longitude
+ * @returns Promise resolving to live or fallback AirQualityData
  */
 export async function getAirQuality(
   city: string,
@@ -105,7 +117,9 @@ export async function getAirQuality(
     lon = preset.longitude;
   }
 
-  const cacheKey = `${city.toLowerCase()}_${lat.toFixed(2)}_${lon.toFixed(2)}`;
+  const safeLat = Number(lat) || 28.61;
+  const safeLon = Number(lon) || 77.20;
+  const cacheKey = `${city.toLowerCase()}_${safeLat.toFixed(2)}_${safeLon.toFixed(2)}`;
   const cached = aqiCache.get(cacheKey);
   const now = Date.now();
 

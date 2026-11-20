@@ -9,11 +9,19 @@ export function CommunityHub({ city }: { city: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = () => {
-    navigator.clipboard?.writeText(
-      `Checked today's air quality on BreatheWise AI in ${city}. Taking smart commute alternatives and protecting indoor air! https://breathewise.ai`
-    );
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(
+          `Checked today's air quality on BreatheWise AI in ${city}. Taking smart commute alternatives and protecting indoor air! https://breathewise.ai`
+        )
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2500);
+        })
+        .catch((err) => {
+          console.warn("Clipboard share failed:", err);
+        });
+    }
   };
 
   return (

@@ -1,6 +1,50 @@
 import { CPCB_BREAKPOINTS, CPCB_STANDARDS } from "./constants";
 import { AQICategoryType, PollutantMeasurement } from "../types/air-quality";
+import { UserProfile } from "../types/profile";
 import { getAqiCategory } from "../utils";
+
+export interface PersonalizedVulnerabilityResult {
+  vulnerabilityScore: number;
+  factors: string[];
+}
+
+/**
+ * Calculates a personalized vulnerability index (0-100) and identifies contributing risk factors
+ * based on household composition, commute exertion, and indoor environment.
+ *
+ * @param profile - Complete user profile including household, commute, and indoor parameters
+ * @returns Object containing numerical vulnerability score (clamped to 100) and descriptive risk factors
+ */
+export function calculatePersonalizedVulnerability(profile: UserProfile): PersonalizedVulnerabilityResult {
+  let vulnerabilityScore = 40; // baseline
+  const factors: string[] = [];
+
+  if (profile.household === "family_children") {
+    vulnerabilityScore += 30;
+    factors.push("Pediatric lung development vulnerability");
+  } else if (profile.household === "household_seniors") {
+    vulnerabilityScore += 30;
+    factors.push("Senior cardiovascular & respiratory sensitivity");
+  }
+
+  if (profile.commuteMethod === "bicycle" || profile.commuteMethod === "walking") {
+    vulnerabilityScore += 25;
+    factors.push(`Active exertion during commute (${profile.commuteDistanceKm} km)`);
+  } else if (profile.commuteMethod === "two_wheeler") {
+    vulnerabilityScore += 20;
+    factors.push("Open roadside tailpipe proximity");
+  }
+
+  if (!profile.indoorEnvironment.hasAirPurifier) {
+    vulnerabilityScore += 15;
+    factors.push("No active indoor HEPA filtration");
+  }
+
+  return {
+    vulnerabilityScore: Math.min(100, vulnerabilityScore),
+    factors,
+  };
+}
 
 /**
  * Calculates Sub-index for a given pollutant according to Indian CPCB Linear Interpolation.

@@ -1,17 +1,38 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export function cn(...inputs: ClassValue[]) {
+/**
+ * Combines conditional CSS class names using clsx and merges Tailwind classes
+ * via tailwind-merge to eliminate conflicting utilities.
+ *
+ * @param inputs - List of class names, conditionals, or objects
+ * @returns Deduplicated and merged Tailwind className string
+ */
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Formats a numerical value with localized digit grouping and fixed decimal precision.
+ *
+ * @param val - Numeric value to format
+ * @param decimals - Decimal places (defaults to 0)
+ * @returns Formatted numeric string
+ */
 export function formatNumber(val: number, decimals: number = 0): string {
-  return val.toLocaleString(undefined, {
+  return (Number(val) || 0).toLocaleString(undefined, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
 }
 
+/**
+ * Maps an Air Quality Index (NAQI) value to its official CPCB categorization,
+ * semantic color tokens, badge styling, and public health advisory.
+ *
+ * @param aqi - Numerical Air Quality Index (0-500+)
+ * @returns Object containing category key, label, CSS styling tokens, and health advisory
+ */
 export function getAqiCategory(aqi: number): {
   label: string;
   category: "good" | "satisfactory" | "moderate" | "poor" | "veryPoor" | "severe";

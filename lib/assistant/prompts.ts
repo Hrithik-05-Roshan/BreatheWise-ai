@@ -1,5 +1,9 @@
 import { StructuredUserContext } from "../types/chat";
 
+/**
+ * Core system prompt enforcing Responsible AI guardrails, scientific grounding,
+ * and deterministic JSON response schemas for air quality decision intelligence.
+ */
 export const SYSTEM_PROMPT = `You are BreatheWise Intelligence, an expert urban environmental health and air quality decision assistant.
 Your mission is: "Don't just tell people how polluted their city is. Tell them what they should do differently today, why it matters, and what impact their decisions create."
 
@@ -31,6 +35,13 @@ Always return your analysis in strict, valid JSON matching the following schema:
   "disclaimer": "This guidance is for environmental risk mitigation and informational purposes only. Consult healthcare professionals for specific clinical advice."
 }`;
 
+/**
+ * Builds a formatted user prompt combining raw query text and structured environmental context.
+ *
+ * @param userQuery - Raw user query prompt
+ * @param context - Structured user environmental and lifestyle context
+ * @returns Fully formatted prompt string ready for LLM invocation
+ */
 export function buildUserPrompt(userQuery: string, context: StructuredUserContext): string {
   return `USER QUERY: "${userQuery}"
 

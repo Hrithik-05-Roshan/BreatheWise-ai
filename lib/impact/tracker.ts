@@ -1,5 +1,8 @@
 import { ImpactSummaryData, SustainableActionItem } from "../types/impact";
 
+/**
+ * Default catalog of measurable sustainability and air quality actions.
+ */
 export const DEFAULT_SUSTAINABLE_ACTIONS: SustainableActionItem[] = [
   {
     id: "act-metro-commute",
@@ -53,6 +56,14 @@ export const DEFAULT_SUSTAINABLE_ACTIONS: SustainableActionItem[] = [
   },
 ];
 
+/**
+ * Aggregates completed sustainability actions into an environmental impact summary,
+ * computing CO2 avoided, cleaner air hours, sustainable commute kilometers, and 7-day trend.
+ *
+ * @param actions - List of sustainable action items with completion statuses
+ * @param streakDays - Active consecutive day streak (defaults to 5)
+ * @returns Structured ImpactSummaryData object compliant with CPCB and CEA emission baselines
+ */
 export function calculateImpactSummary(
   actions: SustainableActionItem[],
   streakDays: number = 5

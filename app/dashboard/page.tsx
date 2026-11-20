@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { UserProfile } from "@/lib/types/profile";
 import { AirQualityData } from "@/lib/types/air-quality";
@@ -89,7 +89,7 @@ function DashboardContent() {
   }, [urlCity]);
 
   // Fetch or Compute Air Quality & Recommendations
-  const loadDashboardData = async (selectedCity: string) => {
+  const loadDashboardData = useCallback(async (selectedCity: string) => {
     setLoading(true);
     try {
       // 1. Fetch Air Quality data via API route with local fallback
@@ -146,11 +146,11 @@ function DashboardContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [profile]);
 
   useEffect(() => {
     loadDashboardData(city);
-  }, [city, profile]);
+  }, [city, loadDashboardData]);
 
   const impactData = calculateImpactSummary(DEFAULT_SUSTAINABLE_ACTIONS);
 

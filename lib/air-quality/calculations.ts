@@ -3,8 +3,12 @@ import { AQICategoryType, PollutantMeasurement } from "../types/air-quality";
 import { getAqiCategory } from "../utils";
 
 /**
- * Calculates Sub-index for a pollutant according to Indian CPCB Linear Interpolation
- * I = I_lo + ((I_hi - I_lo) / (B_hi - B_lo)) * (Cp - B_lo)
+ * Calculates Sub-index for a given pollutant according to Indian CPCB Linear Interpolation.
+ * Formula: I = I_lo + ((I_hi - I_lo) / (B_hi - B_lo)) * (Cp - B_lo)
+ *
+ * @param concentration - Numerical concentration value in ambient air (e.g. µg/m³ or mg/m³)
+ * @param breakpoints - Array of CPCB breakpoint objects containing lower and upper boundaries
+ * @returns Computed integer sub-index (0-500)
  */
 export function calculateSubIndex(
   concentration: number,
@@ -24,6 +28,15 @@ export function calculateSubIndex(
   return 500;
 }
 
+/**
+ * Normalizes raw sensor readings into a typed PollutantMeasurement structure
+ * including standard statutory limits and regulatory ratio.
+ *
+ * @param pollutant - Pollutant key ('pm25', 'pm10', 'no2', 'so2', 'co', 'o3')
+ * @param value - Measured atmospheric concentration
+ * @param unit - Display unit (defaults to 'µg/m³')
+ * @returns Structured PollutantMeasurement object with category and exceedance ratio
+ */
 export function buildPollutantMeasurement(
   pollutant: "pm25" | "pm10" | "no2" | "so2" | "co" | "o3",
   value: number,
@@ -58,7 +71,12 @@ export function buildPollutantMeasurement(
 }
 
 /**
- * Overall AQI is determined by maximum sub-index of critical pollutants as per CPCB NAQI guidelines
+ * Calculates overall National Air Quality Index (NAQI) using the maximum sub-index method
+ * between critical respirable particulate indicators (PM2.5 and PM10).
+ *
+ * @param pm25Val - 24-hour average PM2.5 concentration in µg/m³
+ * @param pm10Val - 24-hour average PM10 concentration in µg/m³
+ * @returns Object containing overall AQI number and identified predominant pollutant
  */
 export function calculateOverallAQI(pm25Val: number, pm10Val: number): {
   aqi: number;

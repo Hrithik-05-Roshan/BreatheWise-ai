@@ -1,7 +1,11 @@
 import { Recommendation, RecommendationContext, DailyPlanSlot } from "../types/recommendations";
 
 /**
- * Deterministic rules that evaluate environmental, household, and lifestyle context
+ * Evaluates environmental air quality data alongside user household, lifestyle,
+ * and commute parameters to synthesize high-priority, actionable health recommendations.
+ *
+ * @param ctx - Detailed recommendation context including AQI, household type, lifestyle, commute, and indoor environment
+ * @returns Array of prioritized recommendations sorted in descending priority order
  */
 export function generatePersonalizedRecommendations(ctx: RecommendationContext): Recommendation[] {
   const recommendations: Recommendation[] = [];
@@ -197,7 +201,12 @@ export function generatePersonalizedRecommendations(ctx: RecommendationContext):
 }
 
 /**
- * Groups recommendations into four distinct diurnal time slots
+ * Groups synthesized recommendations into four distinct diurnal time slots
+ * (Morning, Afternoon, Evening, Night) based on atmospheric dispersion dynamics.
+ *
+ * @param recs - Generated personalized recommendations
+ * @param currentAqi - Real-time AQI index used to project diurnal exposure variances
+ * @returns Array of structured DailyPlanSlot items for day planning
  */
 export function buildDiurnalPlan(recs: Recommendation[], currentAqi: number): DailyPlanSlot[] {
   return [

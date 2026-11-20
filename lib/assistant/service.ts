@@ -2,7 +2,10 @@ import { StructuredUserContext, StructuredAiResponse } from "../types/chat";
 import { SYSTEM_PROMPT, buildUserPrompt } from "./prompts";
 
 /**
- * Sanitize user input against prompt injection and excessive payload attacks
+ * Sanitizes user input against prompt injection vectors, jailbreak attempts, and oversized payloads.
+ *
+ * @param input - Raw prompt string from the client
+ * @returns Sanitized string safe for downstream context injection
  */
 export function sanitizeUserInput(input: string): string {
   if (!input || typeof input !== "string") return "";
@@ -27,8 +30,12 @@ export function sanitizeUserInput(input: string): string {
 }
 
 /**
- * High-quality deterministic intelligence generator when GEMINI_API_KEY is not configured
- * or when the external LLM provider encounters network disruption.
+ * Generates an evidence-based, deterministic air quality intelligence response
+ * when GEMINI_API_KEY is unset or during external provider downtime.
+ *
+ * @param query - Sanitized user inquiry string
+ * @param ctx - Structured environmental and lifestyle user context
+ * @returns StructuredAiResponse object conforming to the UI response schema
  */
 export function generateDeterministicFallbackResponse(
   query: string,
@@ -124,7 +131,12 @@ export function generateDeterministicFallbackResponse(
 }
 
 /**
- * Main AI query handler: Calls Gemini API if configured; otherwise gracefully executes deterministic fallback.
+ * Dispatches an air quality inquiry to the Google Gemini Generative AI API with
+ * strict structured outputs, falling back to the deterministic engine upon failure.
+ *
+ * @param userQuery - Raw user query prompt
+ * @param context - Structured user environmental context (AQI, commute, vulnerabilities)
+ * @returns Promise resolving to a structured AI response object
  */
 export async function askBreatheWiseIntelligence(
   userQuery: string,

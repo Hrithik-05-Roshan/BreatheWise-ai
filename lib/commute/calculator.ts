@@ -33,6 +33,16 @@ const COST_PER_KM = {
   walking: 0.0,
 };
 
+/**
+ * Compares multi-modal commute options (Metro/Bus, Bicycle, Walking, Two-Wheeler, Solo Car)
+ * across estimated respiratory exposure, carbon footprint, transit time, and financial cost.
+ *
+ * @param origin - Origin location name or coordinate string
+ * @param destination - Destination location name or coordinate string
+ * @param distanceKm - One-way travel distance in kilometers
+ * @param currentAqi - Real-time Air Quality Index of the travel corridor
+ * @returns Comprehensive CommuteComparisonResult including mode-by-mode comparisons and sustainability savings
+ */
 export function compareCommuteOptions(
   origin: string,
   destination: string,

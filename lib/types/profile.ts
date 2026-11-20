@@ -35,9 +35,15 @@ export interface IndoorEnvironment {
   ventilationQuality: 'good' | 'moderate' | 'poor';
 }
 
+export type SustainabilityPriority = 
+  | 'low_emissions' 
+  | 'cost_saving' 
+  | 'maximum_protection' 
+  | 'active_lifestyle';
+
 export interface UserPreferences {
   dailyNotifications: boolean;
-  sustainabilityPriorities: ('low_emissions' | 'cost_saving' | 'maximum_protection' | 'active_lifestyle')[];
+  sustainabilityPriorities: SustainabilityPriority[];
   budgetPreference: 'zero_cost' | 'low_cost' | 'flexible';
 }
 

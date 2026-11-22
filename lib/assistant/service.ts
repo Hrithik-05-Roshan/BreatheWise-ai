@@ -1,5 +1,6 @@
 import { StructuredUserContext, StructuredAiResponse } from "../types/chat";
 import { SYSTEM_PROMPT, buildUserPrompt } from "./prompts";
+import { StructuredAiResponseSchema } from "../types/validation";
 
 /**
  * Sanitizes user input against prompt injection vectors, jailbreak attempts, and oversized payloads.
@@ -157,38 +158,45 @@ export async function askBreatheWiseIntelligence(
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      signal: controller.signal,
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: `${SYSTEM_PROMPT}\n\n${userPromptText}` }],
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: `${SYSTEM_PROMPT}\n\n${userPromptText}` }],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.2,
           },
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.2,
-        },
-      }),
-    });
+        }),
+      });
 
-    clearTimeout(timeoutId);
+      if (!response.ok) {
+        throw new Error(`Gemini API error: ${response.status}`);
+      }
 
-    if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+      const data = await response.json();
+      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawText) {
+        throw new Error("Empty response from AI provider");
+      }
+
+      const parsedJson = JSON.parse(rawText);
+      const validated = StructuredAiResponseSchema.safeParse(parsedJson);
+      if (!validated.success) {
+        throw new Error(`AI response failed schema validation: ${validated.error.message}`);
+      }
+
+      return validated.data;
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    const data = await response.json();
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawText) {
-      throw new Error("Empty response from AI provider");
-    }
-
-    const parsed: StructuredAiResponse = JSON.parse(rawText);
-    return parsed;
   } catch (error) {
     console.warn("[AssistantService] Gemini invocation failed, falling back to deterministic engine:", (error as Error).message);
     return generateDeterministicFallbackResponse(sanitizedQuery, context);

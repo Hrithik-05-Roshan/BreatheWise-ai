@@ -38,7 +38,10 @@ The application enforces strict TypeScript configuration (`tsconfig.json`):
 
 ## 3. Resilience & Defensive Error Handling
 - **Client Resilience:** Wrapped using a custom React class `ErrorBoundary` (`components/ui/error-boundary.tsx`). When unexpected errors occur in visual sub-elements (like third-party SVG charts), the error boundary isolates the failure with a friendly retry button, keeping the rest of the application functional.
-- **Asynchronous Defenses:** Clipboard operations in `CommunityHub.tsx` are protected with explicit `.catch()` handlers against denied permissions or non-secure contexts. Coordinates in `lib/air-quality/service.ts` are guarded against `NaN`/undefined.
+- **Asynchronous Defenses & Resource Lifecycle:** All `AbortController` timers in `lib/assistant/service.ts` are bound within `try...finally` blocks, ensuring that `clearTimeout` is guaranteed to execute regardless of network rejections or HTTP errors.
+- **Runtime Deserialization Gate:** External generative AI responses from Gemini are validated at runtime using `StructuredAiResponseSchema.safeParse()`, guaranteeing that malformed JSON is caught defensively before reaching UI components.
+- **Bounded In-Memory Caching:** In-memory maps (`aqiCache` in `service.ts` and `rateLimitMap` in `chat/route.ts`) enforce maximum capacity caps with automatic pruning, preventing monotonic memory growth and leaks.
+- **Clipboard & Coordinate Safeguards:** Clipboard operations in `CommunityHub.tsx` are protected with explicit `.catch()` handlers against denied permissions or non-secure contexts. Coordinates in `lib/air-quality/service.ts` use `Number.isFinite()` checks, preserving legitimate zero coordinates.
 - **Server Resilience:** All Next.js route handlers implement standardized `try...catch` blocks that log technical diagnostics privately and return sanitized error schemas (e.g. `HTTP 400`, `HTTP 429`, `HTTP 500`) to the client without leaking internal stack traces.
 
 ---

@@ -6,8 +6,27 @@ import { askBreatheWiseIntelligence } from "@/lib/assistant/service";
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const MAX_REQUESTS_PER_MINUTE = 20;
 
+function extractClientIp(request: NextRequest): string {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const firstIp = forwarded.split(",")[0]?.trim();
+    if (firstIp) return firstIp.slice(0, 45); // Limit to IPv6 max length
+  }
+  return "local-client";
+}
+
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
+
+  // Prune expired entries if map reaches threshold
+  if (rateLimitMap.size > 500) {
+    rateLimitMap.forEach((record, key) => {
+      if (now > record.resetTime) {
+        rateLimitMap.delete(key);
+      }
+    });
+  }
+
   const record = rateLimitMap.get(ip);
 
   if (!record || now > record.resetTime) {
@@ -26,7 +45,7 @@ function checkRateLimit(ip: string): boolean {
 export async function POST(request: NextRequest) {
   try {
     // 1. Rate Limiting Check
-    const ip = request.headers.get("x-forwarded-for") || "local-client";
+    const ip = extractClientIp(request);
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
         {

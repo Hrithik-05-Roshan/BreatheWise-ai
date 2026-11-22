@@ -78,6 +78,25 @@ export const ChatRequestSchema = z.object({
   }),
 });
 
+export const StructuredAiResponseSchema = z.object({
+  situationAssessment: z.string(),
+  whatThisMeansForYou: z.string(),
+  recommendedActions: z.array(
+    z.object({
+      action: z.string(),
+      timing: z.string(),
+      benefit: z.string(),
+      difficulty: z.enum(["Easy", "Medium", "Hard"]),
+      cost: z.enum(["Free", "Low", "Medium", "High"]),
+    })
+  ),
+  whyTheseActionsMatter: z.string(),
+  estimatedImpact: z.string(),
+  importantPrecautions: z.array(z.string()),
+  dataSourceAndTimestamp: z.string(),
+  disclaimer: z.string(),
+});
+
 export const CommuteQuerySchema = z.object({
   origin: z.string().min(1),
   destination: z.string().min(1),

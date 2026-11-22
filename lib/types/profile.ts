@@ -64,3 +64,27 @@ export interface UserProfile {
   createdAt: string;
   updatedAt: string;
 }
+
+export const DEFAULT_USER_PROFILE: UserProfile = {
+  id: "default-user",
+  city: "Delhi",
+  coordinates: { latitude: 28.6139, longitude: 77.2090 },
+  household: "family_children",
+  lifestyle: "office_commuter",
+  commuteMethod: "public_transport",
+  commuteDistanceKm: 12,
+  indoorEnvironment: {
+    hasAirPurifier: false,
+    hasIndoorPlants: true,
+    windowsFrequentlyOpen: false,
+    cookingFuel: "lpg",
+    ventilationQuality: "moderate",
+  },
+  preferences: {
+    dailyNotifications: true,
+    sustainabilityPriorities: ["low_emissions", "maximum_protection"],
+    budgetPreference: "low_cost",
+  },
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-01T00:00:00.000Z",
+};

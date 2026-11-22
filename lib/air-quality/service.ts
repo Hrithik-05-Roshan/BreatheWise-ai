@@ -108,18 +108,11 @@ export async function getAirQuality(
   longitude?: number
 ): Promise<AirQualityData> {
   // Normalize lookup coordinates
-  let lat = latitude;
-  let lon = longitude;
-
   const preset = INDIAN_CITY_PRESETS[city] || INDIAN_CITY_PRESETS["Delhi"];
-  if (lat === undefined || lon === undefined) {
-    lat = preset.latitude;
-    lon = preset.longitude;
-  }
+  const resolvedLat = Number.isFinite(Number(latitude)) ? Number(latitude) : preset.latitude;
+  const resolvedLon = Number.isFinite(Number(longitude)) ? Number(longitude) : preset.longitude;
 
-  const safeLat = Number(lat) || 28.61;
-  const safeLon = Number(lon) || 77.20;
-  const cacheKey = `${city.toLowerCase()}_${safeLat.toFixed(2)}_${safeLon.toFixed(2)}`;
+  const cacheKey = `${city.toLowerCase()}_${resolvedLat.toFixed(2)}_${resolvedLon.toFixed(2)}`;
   const cached = aqiCache.get(cacheKey);
   const now = Date.now();
 
@@ -131,7 +124,7 @@ export async function getAirQuality(
   const timeoutId = setTimeout(() => controller.abort(), 4500); // 4.5s timeout for fast UI response
 
   try {
-    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,nitrogen_dioxide,sulphur_dioxide,ozone,carbon_monoxide&hourly=pm10,pm2_5&timezone=auto&forecast_days=2`;
+    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${resolvedLat}&longitude=${resolvedLon}&current=pm10,pm2_5,nitrogen_dioxide,sulphur_dioxide,ozone,carbon_monoxide&hourly=pm10,pm2_5&timezone=auto&forecast_days=2`;
 
     const res = await fetch(url, {
       signal: controller.signal,
@@ -153,10 +146,10 @@ export async function getAirQuality(
 
     const pm25 = current.pm2_5;
     const pm10 = current.pm10;
-    const no2 = current.nitrogen_dioxide || 25;
-    const so2 = current.sulphur_dioxide || 15;
-    const co = current.carbon_monoxide ? current.carbon_monoxide / 1000 : 1.2; // convert ug/m3 to mg/m3
-    const o3 = current.ozone || 35;
+    const no2 = typeof current.nitrogen_dioxide === "number" ? current.nitrogen_dioxide : 25;
+    const so2 = typeof current.sulphur_dioxide === "number" ? current.sulphur_dioxide : 15;
+    const co = typeof current.carbon_monoxide === "number" ? current.carbon_monoxide / 1000 : 1.2;
+    const o3 = typeof current.ozone === "number" ? current.ozone : 35;
 
     const { aqi, mainPollutant } = calculateOverallAQI(pm25, pm10);
     const categoryInfo = getAqiCategory(aqi);
@@ -195,8 +188,8 @@ export async function getAirQuality(
 
     const liveData: AirQualityData = {
       city,
-      latitude: lat,
-      longitude: lon,
+      latitude: resolvedLat,
+      longitude: resolvedLon,
       aqi,
       category: categoryInfo.category,
       categoryLabel: categoryInfo.label,
@@ -209,19 +202,24 @@ export async function getAirQuality(
         co: buildPollutantMeasurement("co", co, "mg/m³"),
         o3: buildPollutantMeasurement("o3", o3),
       },
-      hourly: hourlyList.length > 0 ? hourlyList : generateDemonstrationData(city, lat, lon).hourly,
+      hourly: hourlyList.length > 0 ? hourlyList : generateDemonstrationData(city, resolvedLat, resolvedLon).hourly,
       lastUpdated: new Date().toISOString(),
       source: "Open-Meteo European Environment Agency & CPCB Synced Data",
       isSimulatedDemo: false,
       healthAdvisory: categoryInfo.healthAdvisory,
     };
 
+    // Bounded cache: evict oldest if capacity exceeded
+    if (aqiCache.size >= 200) {
+      const oldestKey = aqiCache.keys().next().value;
+      if (oldestKey) aqiCache.delete(oldestKey);
+    }
     aqiCache.set(cacheKey, { data: liveData, timestamp: now });
     return liveData;
   } catch (error) {
     clearTimeout(timeoutId);
     console.warn(`[AirQualityService] Falling back to high-fidelity demonstration model for ${city}:`, (error as Error).message);
-    const demoData = generateDemonstrationData(city, lat, lon);
+    const demoData = generateDemonstrationData(city, resolvedLat, resolvedLon);
     return demoData;
   }
 }

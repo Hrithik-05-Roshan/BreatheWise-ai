@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { UserProfile } from "@/lib/types/profile";
+import { UserProfile, DEFAULT_USER_PROFILE } from "@/lib/types/profile";
 import { AirQualityData } from "@/lib/types/air-quality";
 import { Recommendation, DailyPlanSlot } from "@/lib/types/recommendations";
 import { INDIAN_CITY_PRESETS } from "@/lib/air-quality/constants";
@@ -48,29 +48,7 @@ function DashboardContent() {
   const [diurnalSlots, setDiurnalSlots] = useState<DailyPlanSlot[]>([]);
 
   // Default Profile fallback
-  const [profile, setProfile] = useState<UserProfile>({
-    id: "default-user",
-    city: "Delhi",
-    coordinates: { latitude: 28.6139, longitude: 77.2090 },
-    household: "family_children",
-    lifestyle: "office_commuter",
-    commuteMethod: "public_transport",
-    commuteDistanceKm: 12,
-    indoorEnvironment: {
-      hasAirPurifier: false,
-      hasIndoorPlants: true,
-      windowsFrequentlyOpen: false,
-      cookingFuel: "lpg",
-      ventilationQuality: "moderate",
-    },
-    preferences: {
-      dailyNotifications: true,
-      sustainabilityPriorities: ["low_emissions", "maximum_protection"],
-      budgetPreference: "low_cost",
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  });
+  const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
 
   // Load profile from localStorage if available
   useEffect(() => {

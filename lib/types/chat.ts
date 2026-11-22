@@ -1,3 +1,5 @@
+import { HouseholdType, LifestyleType, CommuteMethod, SustainabilityPriority } from "./profile";
+
 export interface StructuredUserContext {
   location: string;
   aqi: number;
@@ -5,9 +7,9 @@ export interface StructuredUserContext {
   pm25: number;
   pm10: number;
   mainPollutant: string;
-  household: string;
-  lifestyle: string;
-  commute: string;
+  household: HouseholdType | string;
+  lifestyle: LifestyleType | string;
+  commute: CommuteMethod | string;
   commuteDistanceKm?: number;
   indoorEnvironment: {
     hasAirPurifier: boolean;
@@ -17,7 +19,7 @@ export interface StructuredUserContext {
   };
   preferences: {
     budgetPreference: string;
-    sustainabilityPriorities: string[];
+    sustainabilityPriorities: SustainabilityPriority[] | string[];
   };
 }
 

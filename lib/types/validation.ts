@@ -36,7 +36,16 @@ export const ProfileFormSchema = z.object({
   }),
   preferences: z.object({
     dailyNotifications: z.boolean().default(true),
-    sustainabilityPriorities: z.array(z.string()).default(["low_emissions", "maximum_protection"]),
+    sustainabilityPriorities: z
+      .array(
+        z.enum([
+          "low_emissions",
+          "cost_saving",
+          "maximum_protection",
+          "active_lifestyle",
+        ])
+      )
+      .default(["low_emissions", "maximum_protection"]),
     budgetPreference: z.enum(["zero_cost", "low_cost", "flexible"]).default("low_cost"),
   }),
 });

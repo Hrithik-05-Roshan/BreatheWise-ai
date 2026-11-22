@@ -92,19 +92,25 @@ function DashboardContent() {
   const loadDashboardData = useCallback(async (selectedCity: string) => {
     setLoading(true);
     try {
-      // 1. Fetch Air Quality data via API route with local fallback
-      const res = await fetch(`/api/air-quality?city=${encodeURIComponent(selectedCity)}`);
+      // 1. Fetch Air Quality data via API route with robust fallback
       let aqData: AirQualityData;
-      if (res.ok) {
-        const json = await res.json();
-        aqData = json.data;
-      } else {
+      try {
+        const res = await fetch(`/api/air-quality?city=${encodeURIComponent(selectedCity)}`);
+        if (res.ok) {
+          const json = await res.json();
+          aqData = json.data;
+        } else {
+          const preset = INDIAN_CITY_PRESETS[selectedCity] || INDIAN_CITY_PRESETS["Delhi"];
+          aqData = generateDemonstrationData(selectedCity, preset.latitude, preset.longitude);
+        }
+      } catch (networkErr) {
+        console.warn("Dashboard air quality network load warning, using preset fallback", networkErr);
         const preset = INDIAN_CITY_PRESETS[selectedCity] || INDIAN_CITY_PRESETS["Delhi"];
         aqData = generateDemonstrationData(selectedCity, preset.latitude, preset.longitude);
       }
       setAirQuality(aqData);
 
-      // 2. Generate Deterministic Recommendations based on context
+      // 2. Generate Deterministic Recommendations based on unified air quality context
       const recs = generatePersonalizedRecommendations({
         aqi: aqData.aqi,
         pm25: aqData.pollutants.pm25.value,
@@ -123,26 +129,7 @@ function DashboardContent() {
       setRecommendations(recs);
       setDiurnalSlots(buildDiurnalPlan(recs, aqData.aqi));
     } catch (err) {
-      console.error("Dashboard data load failure", err);
-      const preset = INDIAN_CITY_PRESETS[selectedCity] || INDIAN_CITY_PRESETS["Delhi"];
-      const fallbackAq = generateDemonstrationData(selectedCity, preset.latitude, preset.longitude);
-      setAirQuality(fallbackAq);
-      const recs = generatePersonalizedRecommendations({
-        aqi: fallbackAq.aqi,
-        pm25: fallbackAq.pollutants.pm25.value,
-        pm10: fallbackAq.pollutants.pm10.value,
-        city: selectedCity,
-        household: profile.household,
-        lifestyle: profile.lifestyle,
-        commuteMethod: profile.commuteMethod,
-        commuteDistanceKm: profile.commuteDistanceKm,
-        hasAirPurifier: profile.indoorEnvironment.hasAirPurifier,
-        windowsOpen: profile.indoorEnvironment.windowsFrequentlyOpen,
-        cookingFuel: profile.indoorEnvironment.cookingFuel,
-        budgetPreference: profile.preferences.budgetPreference,
-      });
-      setRecommendations(recs);
-      setDiurnalSlots(buildDiurnalPlan(recs, fallbackAq.aqi));
+      console.error("Dashboard recommendation generation failure", err);
     } finally {
       setLoading(false);
     }

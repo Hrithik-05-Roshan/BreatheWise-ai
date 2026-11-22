@@ -14,11 +14,14 @@ BreatheWise AI is designed with **Clean Architecture**, **SOLID principles**, an
 - **Single Responsibility Principle (SRP):**
   - Monolithic dashboard views are decomposed into `OverviewTab`, `DailyPlanTab`, `HourlyChart`, `AQICard`, and `HouseholdChecklist`.
   - The multi-step onboarding wizard is decoupled into a dedicated custom hook (`useOnboardingForm.ts`) and 6 isolated step subcomponents under `components/onboarding/steps/` (`StepLocation`, `StepHousehold`, `StepLifestyle`, `StepCommute`, `StepIndoor`, `StepPreferences`).
+  - The marketing landing page (`app/page.tsx`) is decomposed into 6 focused modular section components under `components/landing/sections/` (`HeroSection`, `ProblemSection`, `FeaturesSection`, `HowItWorksSection`, `ImpactSection`, `CtaSection`), reducing cognitive complexity from 354 lines to a clean 30-line coordinator.
   - The AI assistant interface is decomposed into `ChatInterface.tsx` (~180 lines), `StructuredAiCard.tsx`, and `QuickQuestionsBar.tsx`, eliminating deep JSX nesting and isolating presentational concerns.
   - The exposure vulnerability algorithm is decoupled from `PersonalizedExposureCard.tsx` into a pure, testable domain function `calculatePersonalizedVulnerability` in `lib/air-quality/calculations.ts`.
 
-- **DRY (Don't Repeat Yourself):**
-  Pollutant measurement transformations, CPCB sub-index interpolations, and NAQI category derivations are centralized into reusable utility functions (`calculateSubIndex`, `calculateOverallAQI`, `buildPollutantMeasurement`, `getAqiCategory`).
+- **DRY (Don't Repeat Yourself) & Centralized Constants:**
+  - In `app/dashboard/page.tsx`, recommendation generation and diurnal plan creation are unified into a single deterministic pipeline following air quality resolution, eliminating redundant calculation blocks across try/catch paths.
+  - Urban mobility emission factors, vehicle speeds, and transport costs are centralized in `lib/constants/mobility.ts` with explicit citations to CPCB, MoHUA, and CEA baselines.
+  - Pollutant measurement transformations, CPCB sub-index interpolations, and NAQI category derivations are centralized into reusable utility functions (`calculateSubIndex`, `calculateOverallAQI`, `buildPollutantMeasurement`, `getAqiCategory`).
 
 ---
 

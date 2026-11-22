@@ -1,37 +1,5 @@
 import { CommuteOption, CommuteComparisonResult, TransportMode } from "../types/commute";
-
-/**
- * Standard Indian Urban Mobility & Emission Factors
- * - Solo Car: ~0.165 kg CO2 / km (Petrol hatchback/sedan)
- * - Two-Wheeler (Motorcycle/Scooter): ~0.045 kg CO2 / km
- * - Public Transit (Metro / Electric / CNG Bus combined): ~0.015 kg CO2 / pass-km
- * - Bicycle & Walking: 0.000 kg CO2 / km
- */
-const EMISSION_FACTORS = {
-  car: 0.165,
-  two_wheeler: 0.045,
-  public_transport: 0.015,
-  bicycle: 0.0,
-  walking: 0.0,
-};
-
-// Average urban travel speed in Indian metro corridors (km/h)
-const AVERAGE_SPEED_KMH = {
-  car: 22,
-  two_wheeler: 26,
-  public_transport: 28, // Dedicated metro rail or bus rapid transit
-  bicycle: 14,
-  walking: 4.5,
-};
-
-// Average urban travel cost (INR per km)
-const COST_PER_KM = {
-  car: 12.0, // fuel + maintenance + parking amortized
-  two_wheeler: 3.2,
-  public_transport: 2.5,
-  bicycle: 0.2,
-  walking: 0.0,
-};
+import { EMISSION_FACTORS, AVERAGE_SPEED_KMH, COST_PER_KM } from "../constants/mobility";
 
 /**
  * Compares multi-modal commute options (Metro/Bus, Bicycle, Walking, Two-Wheeler, Solo Car)
